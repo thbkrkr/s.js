@@ -45,7 +45,6 @@
 
   /* $get(url, onSuccess, onFailure) */
   this.$get = function $get(url, onSuccess, onFailure) {
-
     var headers = {}
     var auth = localStorage.getItem('auth')
     if (auth) {
@@ -54,6 +53,40 @@
     $.ajax({
       type: 'GET',
       url: url,
+      contentType: "application/json",
+      headers: headers,
+      success: function(response) {
+        if (typeof response === 'object') {
+          onSuccess(response)
+        } else {
+          onSuccess(JSON.parse(response))
+        }
+      },
+      error: function(xhr, errorType, error) {
+        // Redirect to home if authentication error
+        if (xhr.status === 401) {
+          window.location = '/'
+        }
+        if (!onFailure) {
+          console.error("error on " + xhr.responseURL + " status="+ xhr.status)
+          return
+        }
+        onFailure(error)
+      }
+    })
+  }
+
+  this.$post = function $post(url, data, onSuccess, onFailure) {
+    var headers = {}
+    var auth = localStorage.getItem('auth')
+    if (auth) {
+      headers['X-Qaas-Auth'] = auth
+    }
+    $.ajax({
+      type: 'POST',
+      url: url,
+      data: JSON.stringify(data),
+      contentType: "application/json",
       headers: headers,
       success: function(response) {
         if (typeof response === 'object') {
