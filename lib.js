@@ -116,11 +116,18 @@
   }
 
   this.$lsSet = function $lsSet(key, value) {
+    if (Array.isArray(value) || typeof value === 'object') {
+      value = JSON.stringify(value)
+    }
     localStorage.setItem(key, value)
   }
 
   this.$lsGet = function $lsGet(key) {
-    return localStorage.getItem(key)
+    value = localStorage.getItem(key)
+    if (value && value[0] === '{') {
+      value = JSON.parse(value)
+    }
+    return value
   }
 
   this.$lsRm = function $lsRm(key) {
