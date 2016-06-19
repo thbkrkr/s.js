@@ -229,5 +229,12 @@
     localStorage.removeItem(key)
   }
 
+  window.onload = function() {
+    if (actions) {
+      $bind(actions)
+      $call($param('p'))
+    }
+  }
+
 })();
 
