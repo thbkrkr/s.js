@@ -1,6 +1,6 @@
 (function(){
 
-  /* $param(name) */
+  //@ Extract query param from the URL
   this.$param = function $param(name) {
       var url = window.location.href
       name = name.replace(/[\[\]]/g, "\\$&")
@@ -11,8 +11,8 @@
       return decodeURIComponent(results[2].replace(/\+/g, " "))
   }
 
-  /* $tpl(templateId, dataObject) */
   var cache = {};
+  //@ Fill a template with data
   this.$tpl = function $tpl(str, data) {
     // Figure out if we're getting a template, or if we need to
     // load the template - and be sure to cache the result.
@@ -43,7 +43,9 @@
     return data ? fn( data ) : fn
   }
 
-  /* $get(url, onSuccess, onFailure) */
+  // --
+
+  //@ HTTP GET
   this.$get = function $get(url, onSuccess, onFailure) {
     var headers = {}
     var auth = localStorage.getItem('auth')
@@ -76,6 +78,7 @@
     })
   }
 
+  //@ HTTP POST
   this.$post = function $post(url, data, onSuccess, onFailure) {
     var headers = {}
     var auth = localStorage.getItem('auth')
@@ -109,12 +112,102 @@
     })
   }
 
-  this.$round = function $round(val) {
+  // --
+
+  //@ Call actions[actions].url and bind the result in action template
+  this.$call = function $call(action) {
+    if (action == null) {
+      for (first in actions) break;
+      action = first
+    }
+
+    obj = actions[action]
+
+    // Unactive/active elements and reset template
+    for ( var a in actions ) {
+      if (a == action) {
+        $('.action-'+a).addClass('active')
+      } else {
+        $('.tpl.'+a).html('')
+        $('.action-'+a).removeClass('active')
+      }
+    }
+
+    args = ""
+    r = $param('r')
+    if (r != null) args = "&r=" + r
+    window.history.pushState(action, action, "?p=" + action + args)
+
+    if (obj.loading) {
+      $('.tpl.'+action).html($tpl('tpl_loading'))
+    }
+
+    $loadTpl(action)
+  }
+
+  // Call actions[actions].url and bind the result in action template
+  this.$loadTpl = function $loadTpl(action) {
+    obj = actions[action]
+
+    $get(obj.url, function(data) {
+      // Maybe transform data
+      if (obj.transform) {
+        data = eval(obj.transform)(data)
+      }
+
+      // Fill the template
+      $('.tpl.'+action).html($tpl('tpl_'+action, data))
+
+      // Maybe do something
+      if (obj.onSuccess) {
+        eval(obj.onSuccess)()
+      }
+    })
+  }
+
+  //@ Bind actions on click
+  this.$bind = function $bind(actions) {
+    for ( var k in actions ) {
+      $('.action-'+k).on('click', function() {
+        action = $(this).attr('class').replace(/.*action-/, '').replace(' active', '')
+        $call(action)
+      })
+    }
+    // Refresh
+    r = $param('r')
+    if (r != null) {
+      if (r != null) {
+        setInterval(function() {
+          $call($param('p'))
+        }, 1000*r);
+      }
+    }
+  }
+
+  // --
+
+  //@ Round number using numeral
+  this.$roundNumeral = function $roundNumeral(val) {
     if (isNaN(val)) return val
     //return Number((val).toFixed(2));
     return numeral(val).format('0 0.00 a');
   }
 
+  //@ Round number
+  this.$round = function $round(val) {
+    if (isNaN(val)) return val
+    return Number((val).toFixed(2));
+  }
+
+  //@ Return from now
+  this.$fromNow = function $fromNow(timestamp) {
+    var hours = 0
+    return moment.unix(timestamp).add(hours, 'hours').fromNow()
+  }
+
+  // --
+
+  //@ Put k/v in the local storage
   this.$lsSet = function $lsSet(key, value) {
     if (Array.isArray(value) || typeof value === 'object') {
       value = JSON.stringify(value)
@@ -122,6 +215,7 @@
     localStorage.setItem(key, value)
   }
 
+  //@ Get k/v from the local storage
   this.$lsGet = function $lsGet(key) {
     value = localStorage.getItem(key)
     if (value && value[0] === '{') {
@@ -130,6 +224,7 @@
     return value
   }
 
+  //@ Remove k/v from the local storage
   this.$lsRm = function $lsRm(key) {
     localStorage.removeItem(key)
   }

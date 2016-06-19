@@ -1,11 +1,9 @@
 # s.js
 
-- zepto.js + moment.js + lib.js for **68ko**.
-
-lib.js provides 8 functions:
+- zepto.js + moment.js + utilities functions (size **73ko**).
 
 ```
-# extract query param from the URL
+# Extract query param from the URL
 $param(name)
 
 # Fill a template with data
@@ -17,16 +15,28 @@ $get(url, onSuccess, onFailure)
 # HTTP POST
 $post(url, data, onSuccess, onFailure)
 
-# math round
+# Call actions[actions].url and bind the result in action template
+$call(action)
+
+# Bind actions on click
+$bind(actions)
+
+# Round number using numeral
+$roundNumeral(val)
+
+# Round number
 $round(val)
+
+# Return from now
+$fromNow(timestamp)
 
 # Put k/v in the local storage
 $lsSet(key, value)
 
-# Get k/v in the local storage
+# Get k/v from the local storage
 $lsGet(key)
 
-# Remove k/v in the local storage
+# Remove k/v from the local storage
 $lsRm(key)
 ```
 
