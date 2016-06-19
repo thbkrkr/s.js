@@ -229,7 +229,7 @@
     localStorage.removeItem(key)
   }
 
-  window.onload = function() {
+  this.$init = function $init() {
     if (actions) {
       $bind(actions)
       $call($param('p'))
