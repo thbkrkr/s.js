@@ -46,11 +46,11 @@
   // --
 
   //@ HTTP GET
-  this.$get = function $get(url, onSuccess, onFailure) {
+  this.$get = function $get(url, onSuccess, onFailure, noauth) {
     var headers = {}
     var auth = localStorage.getItem('auth')
     if (auth) {
-      headers['X-Qaas-Auth'] = auth
+      headers['X-Auth'] = auth
     }
     $.ajax({
       type: 'GET',
@@ -66,8 +66,9 @@
       },
       error: function(xhr, errorType, error) {
         // Redirect to home if authentication error
-        if (xhr.status === 401) {
+        if (xhr.status === 401 && !noauth) {
           window.location = '/'
+          localStorage.removeItem('auth')
         }
         if (!onFailure) {
           console.error("error on " + xhr.responseURL + " status="+ xhr.status)
@@ -79,11 +80,11 @@
   }
 
   //@ HTTP POST
-  this.$post = function $post(url, data, onSuccess, onFailure) {
+  this.$post = function $post(url, data, onSuccess, onFailure, noauth) {
     var headers = {}
     var auth = localStorage.getItem('auth')
     if (auth) {
-      headers['X-Qaas-Auth'] = auth
+      headers['X-Auth'] = auth
     }
     $.ajax({
       type: 'POST',
@@ -100,8 +101,9 @@
       },
       error: function(xhr, errorType, error) {
         // Redirect to home if authentication error
-        if (xhr.status === 401) {
+        if (xhr.status === 401 && !noauth) {
           window.location = '/'
+          localStorage.removeItem('auth')
         }
         if (!onFailure) {
           console.error("error on " + xhr.responseURL + " status="+ xhr.status)
