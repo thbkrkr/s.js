@@ -1,25 +1,29 @@
 # s.js
 
 - zepto.js + moment.js + utilities functions (size **73ko**).
+- jquery.js + semantic.js + utilities functions (size **73ko**).
 
 ```
-# Extract query param from the URL
-$param(name)
+# Load HTML templates then call a function
+$loadTpls(tpls, onSuccess)
 
 # Fill a template with data
 $tpl(str, data)
 
 # HTTP GET
-$get(url, onSuccess, onFailure)
+$get(url, onSuccess, onFailure, noauth)
 
 # HTTP POST
-$post(url, data, onSuccess, onFailure)
+$post(url, data, onSuccess, onFailure, noauth)
 
-# Call actions[actions].url and bind the result in action template
+# Call actions[<action>].url then bind the data result in a template 'tpl_<action>' and place the HTML result in an element with class equals to '.action-<action>'
 $call(action)
 
 # Bind actions on click
 $bind(actions)
+
+# Extract query param from the URL
+$param(name)
 
 # Round number using numeral
 $roundNumeral(val)

@@ -1,14 +1,30 @@
 (function(){
 
-  //@ Extract query param from the URL
-  this.$param = function $param(name) {
-      var url = window.location.href
-      name = name.replace(/[\[\]]/g, "\\$&")
-      var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-          results = regex.exec(url)
-      if (!results) return null
-      if (!results[2]) return ''
-      return decodeURIComponent(results[2].replace(/\+/g, " "))
+  //@ Load HTML templates then call a function
+  this.$loadTpls = function $loadTpls(tpls, onSuccess) {
+    var tplsE = document.createElement('div');
+
+    var done = tpls.length
+    tpls.forEach(function(tpl, i) {
+      var tplE = document.createElement('div');
+      tplE.setAttribute('id', 'tpl-'+i)
+      tplsE.append(tplE)
+      $(tplE).load(tpl+'?v='+v, function() {
+        done--
+        if (done == 0) onSuccess()
+      })
+    })
+
+    document.body.append(tplsE)
+  }
+
+  function getTpl(id) {
+    elem = document.getElementById(id)
+    if (!elem) {
+      console.error('Template #' + id + ' not found')
+      return 'no template'
+    }
+    return elem.innerHTML
   }
 
   var cache = {};
@@ -18,7 +34,7 @@
     // load the template - and be sure to cache the result.
     var fn = !/\W/.test(str) ?
       cache[str] = cache[str] ||
-        $tpl(document.getElementById(str).innerHTML) :
+        $tpl(getTpl(str)) :
 
       // Generate a reusable function that will serve as a template
       // generator (and which will be cached).
@@ -116,7 +132,28 @@
 
   // --
 
-  //@ Call actions[actions].url and bind the result in action template
+  // Call actions[actions].url and bind the result in action template
+  this.$loadTpl = function $loadTpl(action) {
+    obj = actions[action]
+
+    $get(obj.url, function(data) {
+      // Maybe transform data
+      if (obj.transform) {
+        data = eval(obj.transform)(data)
+      }
+
+      // Fill the template
+      $('.tpl.'+action).html($tpl('tpl_'+action, data))
+
+      // Maybe do something
+      if (obj.onSuccess) {
+        eval(obj.onSuccess)()
+      }
+    })
+  }
+
+  //@ Call actions[<action>].url then bind the data result in a template 'tpl_<action>' and
+  // place the HTML result in an element with class equals to '.action-<action>'
   this.$call = function $call(action) {
     if (action == null) {
       for (first in actions) break;
@@ -147,26 +184,6 @@
     $loadTpl(action)
   }
 
-  // Call actions[actions].url and bind the result in action template
-  this.$loadTpl = function $loadTpl(action) {
-    obj = actions[action]
-
-    $get(obj.url, function(data) {
-      // Maybe transform data
-      if (obj.transform) {
-        data = eval(obj.transform)(data)
-      }
-
-      // Fill the template
-      $('.tpl.'+action).html($tpl('tpl_'+action, data))
-
-      // Maybe do something
-      if (obj.onSuccess) {
-        eval(obj.onSuccess)()
-      }
-    })
-  }
-
   //@ Bind actions on click
   this.$bind = function $bind(actions) {
     for ( var k in actions ) {
@@ -186,7 +203,26 @@
     }
   }
 
+  this.$initActions = function $initActions() {
+    if (actions) {
+      $bind(actions)
+      $call($param('p'))
+    }
+  }
+
+
   // --
+
+  //@ Extract query param from the URL
+  this.$param = function $param(name) {
+      var url = window.location.href
+      name = name.replace(/[\[\]]/g, "\\$&")
+      var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+          results = regex.exec(url)
+      if (!results) return null
+      if (!results[2]) return ''
+      return decodeURIComponent(results[2].replace(/\+/g, " "))
+  }
 
   //@ Round number using numeral
   this.$roundNumeral = function $roundNumeral(val) {
@@ -229,13 +265,6 @@
   //@ Remove k/v from the local storage
   this.$lsRm = function $lsRm(key) {
     localStorage.removeItem(key)
-  }
-
-  this.$init = function $init() {
-    if (actions) {
-      $bind(actions)
-      $call($param('p'))
-    }
   }
 
 })();
