@@ -1,7 +1,18 @@
 # s.js
 
-- zepto.js + moment.js + utilities functions (size **73ko**).
-- jquery.js + semantic.js + utilities functions (size **73ko**).
+Goodies + [zepto|jquery][moment][semantic].
+
+- goodies (s.xyz.js **3.1ko**)
+- goodies + zepto.js (s.xyz.z.js **29ko**)
+- goodies + jquery.js (s.xyz.j.js **88ko**)
+- goodies + zepto.js  + moment.js (s.xyz.zm.js (**87ko**)
+- goodies + jquery.js + moment.js (s.xyz.jm.js **145ko**)
+- goodies + zepto.js  + semantic.js (s.xyz.zs.js **298ko**)
+- goodies + jquery.js + semantic.js (s.xyz.js.js **357ko**)
+- goodies + zepto.js  + semantic.js + moment.js (s.xyz.zsm.js **356ko**)
+- goodies + jquery.js + semantic.js + moment.js (s.xyz.jsm.js **414ko**)
+
+## Goodies
 
 ```
 # Load HTML templates then call a function
