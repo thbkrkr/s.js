@@ -8,14 +8,14 @@
     tpls.forEach(function(tpl, i) {
       var tplE = document.createElement('div');
       tplE.setAttribute('id', 'tpl-'+i)
-      tplsE.append(tplE)
+      tplsE.appendChild(tplE)
       $(tplE).load(tpl+'?v='+v, function() {
         done--
         if (done == 0) onSuccess()
       })
     })
 
-    document.body.append(tplsE)
+    document.body.appendChild(tplsE)
   }
 
   function getTpl(id) {
