@@ -53,5 +53,14 @@ $lsGet(key)
 
 # Remove k/v from the local storage
 $lsRm(key)
+
+# Scroll to the bottom of an element in a given duration
+$scrollToBottom(element, duration)
+
+# Resize the element height to the window height less a given height
+$setElementHeight(elemClass, height)
+
+# Create a WebSocket
+$newWS(onopen, onmessage)
 ```
 

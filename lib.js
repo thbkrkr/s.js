@@ -267,5 +267,77 @@
     localStorage.removeItem(key)
   }
 
+  // --
+
+  //@ Scroll to the bottom of an element in a given duration
+  this.$scrollToBottom = function $scrollToBottom(element, duration) {
+    var el  = element[0];
+    var startPosition = el.scrollTop
+    var delta = el.scrollHeight - element.height() - startPosition
+
+    var startTime = Date.now();
+
+    function scroll() {
+      var fraction = Math.min(1, (Date.now() - startTime) / duration)
+      el.scrollTop = delta * fraction + startPosition
+      if(fraction < 1) {
+        setTimeout(scroll, 10)
+      }
+    }
+    scroll()
+  }
+
+  //@ Resize the element height to the window height less a given height
+  this.$setElementHeight = function $setElementHeight(elemClass, height) {
+    $(elemClass).height($(window).height() - height)
+  }
+
+  // --
+
+  this.$ws = null
+
+  var _wsCtx = {
+    greet: false,
+    attempts: 0
+  }
+
+  //@ Create a WebSocket
+  this.$WS = function $newWS(onopen, onmessage) {
+    wsProto = 'ws:'
+    if (window.location.protocol == 'https:') {
+      wsProto = 'wss:'
+    }
+
+    this.$ws = new WebSocket(wsProto + '//' + window.location.host + '/ws')
+
+    this.$ws.onopen = function() {
+      _wsCtx.attempts = 1
+      if (!_wsCtx.greet) {
+        _wsCtx.greet = true
+        if (onopen) {
+          onopen(this.$ws)
+        }
+      }
+    }
+
+    this.$ws.onmessage = onmessage
+
+    this.$ws.onerror = function(event) {
+    }
+
+    function _generateInterval(k) {
+      return Math.min(15, (Math.pow(2, k) - 1)) * 1000;
+    }
+
+    this.$ws.onclose = function(event) {
+      var time = _generateInterval(_wsCtx.attempts);
+      $('#send').attr('placeholder', 'Connexion lost, retry in ' + (time/1000) + ' s...')
+      setTimeout(function () {
+          _wsCtx.attempts++
+          $WS(onopen, onmessage)
+      }, time)
+    }
+  }
+
 })();
 
