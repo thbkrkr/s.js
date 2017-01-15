@@ -291,52 +291,44 @@
     $(elemClass).height($(window).height() - height)
   }
 
-  // --
-
-  this.$ws = null
-
   var _wsCtx = {
-    greet: false,
     attempts: 0
   }
 
   //@ Create a WebSocket
-  this.$WS = function $newWS(onopen, onmessage) {
+  this.$ws = function (path, onopenF, oncloseF, onmessageF) {
     wsProto = 'ws:'
     if (window.location.protocol == 'https:') {
       wsProto = 'wss:'
     }
 
-    this.$ws = new WebSocket(wsProto + '//' + window.location.host + '/ws')
+    ws = new WebSocket(wsProto + '//' + window.location.host + path)
 
-    this.$ws.onopen = function() {
+    ws.onopen = function() {
       _wsCtx.attempts = 1
-      if (!_wsCtx.greet) {
-        _wsCtx.greet = true
-        if (onopen) {
-          onopen(this.$ws)
-        }
-      }
+      onopenF(path, onopenF)
     }
 
-    this.$ws.onmessage = onmessage
-
-    this.$ws.onerror = function(event) {
+    ws.onmessage = function(event) {
+      onmessageF(event)
     }
 
     function _generateInterval(k) {
       return Math.min(15, (Math.pow(2, k) - 1)) * 1000
     }
 
-    this.$ws.onclose = function(event) {
+    ws.onclose = function(event) {
       var time = _generateInterval(_wsCtx.attempts)
-      $('#send').attr('placeholder', 'Connexion lost, retry in ' + (time/1000) + ' s...')
+      oncloseF(time)
       setTimeout(function () {
           _wsCtx.attempts++
-          $WS(onopen, onmessage)
+          ws = $ws(path, onopenF, oncloseF, onmessageF)
       }, time)
     }
+
+    return ws
   }
+
 
 })()
 

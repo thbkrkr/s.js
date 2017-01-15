@@ -1,5 +1,5 @@
 SHA1 = $$(git rev-parse --short HEAD)
-V = 10
+V = 11
 
 dist: clean
 	rm -rf dist && mkdir dist
