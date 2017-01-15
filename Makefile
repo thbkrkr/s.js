@@ -1,12 +1,12 @@
 SHA1 = $$(git rev-parse --short HEAD)
-V = 8
+V = 9
 
 dist: clean
 	rm -rf dist && mkdir dist
-	wget -q https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js -O dist/j.js
-	wget -q https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.4/semantic.min.js -O dist/s.js
+	wget -q https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js -O dist/j.js
+	wget -q https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.7/semantic.min.js -O dist/s.js
 	wget -q https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js -O dist/z.js
-	wget -q https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment.min.js -O dist/m.js
+	wget -q https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js -O dist/m.js
 	cp lib.js dist/lib.js
 	docker run --rm -v $$(pwd)/dist:/dist krkr/closure-compiler dist/lib.js dist/u.js
 	cd dist && cat u.js > s.$(V).$(SHA1).js
