@@ -2,11 +2,11 @@
 
   //@ Load HTML templates then call a function
   this.$loadTpls = function $loadTpls(tpls, onSuccess) {
-    var tplsE = document.createElement('div');
+    var tplsE = document.createElement('div')
 
     var done = tpls.length
     tpls.forEach(function(tpl, i) {
-      var tplE = document.createElement('div');
+      var tplE = document.createElement('div')
       tplE.setAttribute('id', 'tpl-'+i)
       tplsE.appendChild(tplE)
       $(tplE).load(tpl+'?v='+v, function() {
@@ -27,7 +27,7 @@
     return elem.innerHTML
   }
 
-  var cache = {};
+  var cache = {}
   //@ Fill a template with data
   this.$tpl = function $tpl(str, data) {
     // Figure out if we're getting a template, or if we need to
@@ -156,7 +156,7 @@
   // place the HTML result in an element with class equals to '.action-<action>'
   this.$call = function $call(action) {
     if (action == null) {
-      for (first in actions) break;
+      for (first in actions) break
       action = first
     }
 
@@ -198,7 +198,7 @@
       if (r != null) {
         setInterval(function() {
           $call($param('p'))
-        }, 1000*r);
+        }, 1000*r)
       }
     }
   }
@@ -227,14 +227,13 @@
   //@ Round number using numeral
   this.$roundNumeral = function $roundNumeral(val) {
     if (isNaN(val)) return val
-    //return Number((val).toFixed(2));
-    return numeral(val).format('0 0.00 a');
+    return numeral(val).format('0 0.00 a')
   }
 
   //@ Round number
   this.$round = function $round(val) {
     if (isNaN(val)) return val
-    return Number((val).toFixed(2));
+    return Number((val).toFixed(2))
   }
 
   //@ Return from now
@@ -271,11 +270,11 @@
 
   //@ Scroll to the bottom of an element in a given duration
   this.$scrollToBottom = function $scrollToBottom(element, duration) {
-    var el  = element[0];
+    var el  = element[0]
     var startPosition = el.scrollTop
     var delta = el.scrollHeight - element.height() - startPosition
 
-    var startTime = Date.now();
+    var startTime = Date.now()
 
     function scroll() {
       var fraction = Math.min(1, (Date.now() - startTime) / duration)
@@ -326,11 +325,11 @@
     }
 
     function _generateInterval(k) {
-      return Math.min(15, (Math.pow(2, k) - 1)) * 1000;
+      return Math.min(15, (Math.pow(2, k) - 1)) * 1000
     }
 
     this.$ws.onclose = function(event) {
-      var time = _generateInterval(_wsCtx.attempts);
+      var time = _generateInterval(_wsCtx.attempts)
       $('#send').attr('placeholder', 'Connexion lost, retry in ' + (time/1000) + ' s...')
       setTimeout(function () {
           _wsCtx.attempts++
@@ -339,5 +338,5 @@
     }
   }
 
-})();
+})()
 
