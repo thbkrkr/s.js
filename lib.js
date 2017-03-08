@@ -83,7 +83,7 @@
       error: function(xhr, errorType, error) {
         // Redirect to home if authentication error
         if (xhr.status === 401 && !noauth) {
-          window.location = '/'
+          window.location = AUTH_LOGIN_PATH
           localStorage.removeItem('auth')
         }
         if (!onFailure) {
@@ -118,7 +118,7 @@
       error: function(xhr, errorType, error) {
         // Redirect to home if authentication error
         if (xhr.status === 401 && !noauth) {
-          window.location = '/'
+          window.location = AUTH_LOGIN_PATH
           localStorage.removeItem('auth')
         }
         if (!onFailure) {
