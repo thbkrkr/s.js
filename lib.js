@@ -297,12 +297,17 @@
 
   //@ Create a WebSocket
   this.$ws = function (path, onopenF, oncloseF, onmessageF) {
-    wsProto = 'ws:'
-    if (window.location.protocol == 'https:') {
-      wsProto = 'wss:'
+    if (path.indexOf('s://') != -1) {
+      url = path
+    } else {
+      wsProto = 'ws:'
+      if (window.location.protocol == 'https:') {
+        wsProto = 'wss:'
+      }
+      url = wsProto + '//' + window.location.host + path
     }
 
-    ws = new WebSocket(wsProto + '//' + window.location.host + path)
+    ws = new WebSocket(url)
 
     ws.onopen = function() {
       _wsCtx.attempts = 1
