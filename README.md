@@ -27,7 +27,14 @@ $get(url, onSuccess, onFailure, noauth)
 # HTTP POST
 $post(url, data, onSuccess, onFailure, noauth)
 
-# Call actions[<action>].url then bind the data result in a template 'tpl_<action>' and place the HTML result in an element with class equals to '.action-<action>'
+# @ Sync the result of an HTTP GET (/<action> or obj.url or actions[actions].url or obj.url)
+# in a html element (class: ui-<action>) using a template (id: tpl_<action>)
+$sync(action, obj)
+
+# Call an action, like $sync with more features:
+# toggle '.ui-<action>'' html elements
+# update the browser history
+# show optionally a loading template
 $call(action)
 
 # Bind actions on click
@@ -61,6 +68,7 @@ $scrollToBottom(element, duration)
 $setElementHeight(elemClass, height)
 
 # Create a WebSocket
-$newWS(onopen, onmessage)
+$ws(url, onopenF, oncloseF, onmessageF)
+
 ```
 

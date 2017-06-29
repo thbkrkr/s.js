@@ -132,43 +132,55 @@
 
   // --
 
-  // Call actions[actions].url and bind the result in action template
-  this.$loadTpl = function $loadTpl(action) {
-    obj = actions[action]
+  //@ Sync the result of an HTTP GET (/<action> or obj.url or actions[actions].url or obj.url)
+  // in a html element (class: ui-<action>) using a template (id: tpl_<action>)
+  this.$sync = function $sync(action, obj) {
+    if (typeof(actions) != 'undefined') {
+      obj = actions[action]
+    }
+    if (!obj || (obj && !obj.url)) {
+      url = '/'+ action
+    } else {
+      url = obj.url
+    }
+    if (!url) {
+      console.error('url not defined in obj:', obj)
+      return
+    }
 
-    $get(obj.url, function(data) {
+    $get(url, function(data) {
       // Maybe transform data
-      if (obj.transform) {
+      if (obj && obj.transform) {
         data = eval(obj.transform)(data)
       }
 
       // Fill the template
-      $('.tpl.'+action).html($tpl('tpl_'+action, data))
+      $('.ui-'+action).html($tpl('tpl_'+action, data))
 
       // Maybe do something
-      if (obj.onSuccess) {
+      if (obj && obj.onSuccess) {
         eval(obj.onSuccess)()
       }
     })
   }
 
-  //@ Call actions[<action>].url then bind the data result in a template 'tpl_<action>' and
-  // place the HTML result in an element with class equals to '.action-<action>'
+  //@ Call an action, like $sync with more features:
+  // toggle '.ui-<action>'' html elements
+  // update the browser history
+  // show optionally a loading template
   this.$call = function $call(action) {
     if (action == null) {
       for (first in actions) break
       action = first
     }
 
-    obj = actions[action]
-
     // Unactive/active elements and reset template
     for ( var a in actions ) {
       if (a == action) {
-        $('.action-'+a).addClass('active')
+        $('.ui-action-'+a).addClass('active')
       } else {
-        $('.tpl.'+a).html('')
-        $('.action-'+a).removeClass('active')
+        $('.ui-'+a).html('')
+        $('.ui-action-'+a).removeClass('active')
       }
     }
 
@@ -177,11 +189,12 @@
     if (r != null) args = "&r=" + r
     window.history.pushState(action, action, "?p=" + action + args)
 
+    obj = actions[action]
     if (obj.loading) {
-      $('.tpl.'+action).html($tpl('tpl_loading'))
+      $('.ui-'+action).html($tpl('tpl_loading'))
     }
 
-    $loadTpl(action)
+    $sync(action)
   }
 
   //@ Bind actions on click
@@ -296,22 +309,20 @@
   }
 
   //@ Create a WebSocket
-  this.$ws = function (path, onopenF, oncloseF, onmessageF) {
-    if (path.indexOf('s://') != -1) {
-      url = path
-    } else {
+  this.$ws = function $ws(url, onopenF, oncloseF, onmessageF) {
+    if (url.indexOf('s://') == -1) {
       wsProto = 'ws:'
       if (window.location.protocol == 'https:') {
         wsProto = 'wss:'
       }
-      url = wsProto + '//' + window.location.host + path
+      url = wsProto + '//' + window.location.host + url
     }
 
     ws = new WebSocket(url)
 
     ws.onopen = function() {
       _wsCtx.attempts = 1
-      onopenF(path, onopenF)
+      onopenF(url, onopenF)
     }
 
     ws.onmessage = function(event) {
@@ -327,7 +338,7 @@
       oncloseF(time)
       setTimeout(function () {
           _wsCtx.attempts++
-          ws = $ws(path, onopenF, oncloseF, onmessageF)
+          ws = $ws(url, onopenF, oncloseF, onmessageF)
       }, time)
     }
 
